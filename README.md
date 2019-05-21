@@ -1,6 +1,8 @@
-#TODO : Bryanthings... 
-
 # Lab 06: Configuration Management - Ansible
+> Authors : Curchod Bryan - Muaremi Dejvid    
+> Professor : Graf Marcel   
+> Assistants : Gardel Bastian   
+> Date : 16.05.2019
 
 ## Task 1: Install Ansible
 
