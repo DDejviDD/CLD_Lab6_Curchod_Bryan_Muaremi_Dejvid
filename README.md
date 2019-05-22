@@ -53,7 +53,7 @@ We use a directory called playbooks for this. In this directory we create a file
 
 ![Creating the hosts file](./img/Task3_1.png "Creating the hosts file")
 
-Then we added the following instructions in the file. We have broken the file contents up across multiple lines so that it fits on the page, but it is all on one line in our file, without any backslashes.
+Then we added the following instructions in the file. The content shown here is formated to fit in the page and to better be readable. In the real file, the content is on a single line (the backslashes here represent a new line).
 
 ```
 testserver ansible_ssh_host=3.92.213.119 \
@@ -73,8 +73,6 @@ You should see output similar to the following:
 
 ![Result of the ping](./img/Task3_2.png "Result of the ping")
 
-
-
 We can now simplify the configuration of Ansible by using an ansible.cfg file which allows us to set some defaults.
 
 ![Creating the ansible.cfg file](./img/Task3_3.png "Creating the ansible.cfg file")
@@ -90,7 +88,7 @@ host_key_checking = false
 deprecation_warnings = false
 ```
 
-Among the default options we also disable SSH's host key checking. This is convenient when we distroy and recreate the managed server (it will get a new host key every time). In production this may be a security risk.
+Among the default options we also disable SSH's host key checking. This is convenient when we destroy and recreate the managed server (it will get a new host key every time). In production this may be a security risk.
 We also disable warnings about deprecated features that the 2.x version of Ansible emits.
 
 With these default values the hosts inventory file now simplifies to:
@@ -118,7 +116,7 @@ You should see output similar to this:
 
 # Task 4: Install web application
 
-In this task we will configure the managed host to run an nginx web server. This will necessitate four files:
+In this task we will configure the managed host to run an nginx web server. This will require four files:
 
 - The inventory file from the previous task (playbooks/hosts).
 - A playbook with instructions what to configure (playbooks/web.yml).
@@ -220,8 +218,6 @@ You can then test the new web site by pointing your browser to the address of th
 
 # Task 5: Test Desired State Configuration principles
 
-#TODO : Bryanthings... : commenter les TASK [ blablabla ]
-
 In this task we will do some tests to verify that Ansible implements the principles of Desired State Configuration.
 
 According to this principle, before doing anything, Ansible should establish the current state of the managed server, compare it to the desired state expressed in the playbook, and then only perform the actions necessary to bring the current state to the desired state.
@@ -231,32 +227,33 @@ In its ouput Ansible marks tasks where it had to perform some action as changed 
 ## Return to the output of running the web.yml playbook the first time.
 ![First run of the ansible-playbook](./img/Task4_5.png "First run of the ansible-playbook")
 __There is one additional task that was not in the playbook.__
-  - TASK [Gathering Facts] look at the server and the playbook and compare them
+
+  - ***TASK [Gathering Facts]*** - look at the server and the playbook and compare them
 
 __Among the tasks that are in the playbook there is one task that Ansible marked as ok.__
-- TASK [enable configuration] 
+- ***TASK [enable configuration]*** - copy a file if the configuration is completed for a site
 
 __Do you have a possible explanation?__
 
 ## Re-run the web.yml playbook a second time. In principle nothing should have changed. 
 ![Second run of the ansible, without changes](./img/Task5_2.png "Second run of the ansible, without changes")
 __Compare Ansible's output with the first run. Which tasks are marked as changed?__
-- TASK [restart nginx]
+- ***TASK [restart nginx]***  - Restart the nginx server
 
 ## SSH into the managed server. Modify the nginx configuration file /etc/nginx/sites-available/default, for example by adding a line with a comment. Re-run the playbook. 
 ![SSH connection to the server](./img/Task5_3_1.png "SSH connection to the server")
 ![Updating the file /etc/nginx/sites-available/default](./img/Task5_3_2.png "Updating the file /etc/nginx/sites-available/default")
 ![Reset the file using Ansible](./img/Task5_3_3.png "Reset the file using Ansible")
 __What does Ansible do to the file and what does it show in its output?__
-- TASK [copy nginx config file] replace the nginx.conf file
-- TASK [restart nginx] restart the nginx server
+- ***TASK [copy nginx config file]*** - replace the nginx.conf file
+- ***TASK [restart nginx]*** - restart the nginx server
 
 
 ## Do something more drastic like completely removing the homepage and repeat the previous question.
 ![Deleting the index.html file](./img/Task5_4_1.png "Deleting the index.html file")
 ![Reset the index.html file](./img/Task5_4_2.png "Updating the file /etc/nginx/sites-available/default")
-- TASK [copy index.html] Reset the index.html file
-- TASK [restart nginx] Restart the nginx server
+- ***TASK [copy index.html]*** - Reset the index.html file
+- ***TASK [restart nginx]*** - Restart the nginx server
 
 __Remark :__ As we can see it on the last question, the nginx server is always restarted even when we just change an html file. This is not a good behaviour and we will change it in the next task.
 
@@ -268,9 +265,9 @@ In this task we will improve the playbook by restarting nginx only when needed.
 
 The current version of the playbook restarts nginx every time the playbook is run, just in case something in nginx's configuration changed that the running nginx process needs to pick up.
 
-By putting the nginx restart not into a task, but into a handler, its execution can be made conditional. What we want is that nginx is only restarted if one of the tasks that affects nginx's configuration had a change.
+By putting the nginx restart not into a task, but into a handler because its execution can be made conditional. What we want is that nginx is only restarted if one of the tasks that affects nginx's configuration had a change.
 
-Following the the Ansible documentation about handlers, we modified the playbook so that the nginx restart becomes a handler and the tasks that potentially modify its configuration use notify to call the handler when needed. The playbook is now the following :
+Following the the Ansible documentation about handlers, we modified the playbook so that the nginx restart becomes a handler and the tasks that potentially modify its configuration use `notify` to call the handler when needed. The playbook is now the following :
 
 ```
 - name: Configure webserver with nginx
@@ -320,12 +317,8 @@ Test the new server by pointing your web browser to it.
 What happens if a server is not reachable? Shut down the second instance and re-run the playbook.
 ![Running the ansible-playbook whit a missing server](./img/Task7_3.png "Running the ansible-playbook whit a missing server")
 
-
+```
 Suppose you now have 10 web servers in production that you have configured using Ansible. You are working in the IT department of a company and some of your system administrator colleagues who don't use Ansible have logged manually into some of the servers to fix certain things. You don't know what they did exactly. What do you need to do to bring all 10 servers again to the initial state? We'll exclude drastic changes by your colleagues for this question.
+```
 
-#TODO : Bryanthings...
-Genre si tu run ansible-playbook ... ça devrait les reset non ?
- - Visiblement ça check l'état courant / attendu et ça fait les changements
-
-Il faut chercher une autre solution (plus propre)
- - Bastien : Je croix que c'est ailleurs. Mais demande plutôt au prof
+By running `ansible-playbook ...`, we should be able to reset every server in the server group in the state described in the configuration file, in other words in the initial state.
